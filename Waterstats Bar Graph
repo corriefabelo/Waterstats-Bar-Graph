@@ -1,0 +1,33 @@
+waterstats<-data.frame(ReproductiveStatus=levels(waterstats$status), Percentbodyweightlostdaily=(tapply(waterstats$avgdailypercent, waterstats$status, mean)),n=tapply(waterstats$avgdailypercent, waterstats$status, length),sd=tapply(waterstats$avgdailypercent, waterstats$status, sd))
+
+waterstats$sem<-waterstats$sd/sqrt(waterstats$n)
+
+require(ggplot2)
+
+Waterstats<- ggplot(waterstats, aes(x=ReproductiveStatus, y=Percentbodyweightlostdaily, fill=ReproductiveStatus))
+
+Waterstats<- Waterstats +
+  geom_bar(position=position_dodge(), stat="identity") +  
+  geom_errorbar(aes(ymin=Percentbodyweightlostdaily-waterstats$sem, ymax=Percentbodyweightlostdaily+waterstats$sem)) + 
+  labs( 
+    list( 
+      x="Reproductive Status",  
+      y="Percent body weight lost daily")  
+  ) + 
+  theme( 
+    panel.background=element_rect(fill="white"), 
+    axis.line=element_line(size=.5,colour="black"),  
+    text=element_text(colour="black",size=20, family="Times")  
+  ) + 
+  scale_fill_discrete( 
+    name="Reproductive Status", 
+    breaks=c("EL","EV","LL","LV"), 
+    labels=c("EL", "EV", "LL", "LV") 
+  ) + 
+  scale_y_continuous(expand = c(0, 0))+ 
+  scale_x_discrete(  
+    breaks=c("EL","EV","LL","LV"), 
+    labels=c("EL", "EV", "LL", "LV") 
+  ) 
+
+Waterstats
